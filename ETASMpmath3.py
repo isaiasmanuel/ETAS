@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 22 10:03:45 2024
-
-@author: isaias
-"""
-    
 
 from mpmath import mp
 import numpy as np
@@ -21,12 +13,12 @@ from multiprocessing import Pool, cpu_count, get_context, Process
 ################ Read data
 
 Datos=pd.read_csv('/Users/isaias/Desktop/hypo_MASUB.csv',delimiter=",")
-anio=2004
+anio=2003
 Datos=Datos.loc[ Datos["Year"]<anio]
 Datos.loc[0]
 
 
-
+sectoyear=86400
 
 ################ Dates and distances
 
@@ -51,15 +43,15 @@ maxdate=datetime(anio, 1,1)
 ############## Integration region
 
 np.max(Fechas)
-# Tmax=(np.max(Fechas)-np.min(Fechas)).total_seconds()
 
-Tmax=(maxdate-mindate).total_seconds()
+
+Tmax=(maxdate-mindate).total_seconds()/sectoyear
 latmin=np.min(Datos["Latitude"])-1
 latmax=np.max(Datos["Latitude"])+1
 lonmin=np.min(Datos["Longitude"])-1
 lonmax=np.max(Datos["Longitude"])+1
 
-# print(np.max(Fechas)-np.min(Fechas))
+
 print(maxdate-mindate)
 print(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))
 print(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))
@@ -100,10 +92,6 @@ def g(t,p,c):
   return (p-1)*mp.power(c,p-1)*mp.power(t+c,-p)*(t>0)
 
 
-
-
-# def k(x,y,d):
-#   return np.exp(-(Dist[x,y])/(2*d**2))/(2*d*np.pi)
 ################# Define two lambda, one is to integrate
 
 
@@ -147,27 +135,11 @@ def lamInt(obs,theta):
       Lat=Datos["Latitude"].loc[Record]
       Lon=Datos["Longitude"].loc[Record]
       #value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*(1/(2*np.pi*d*np.exp(alpha*(Mag-M0)))*np.exp(-((x-Lat)**2+(y-Lon)**2)/(2*d*np.exp(alpha*(Mag-M0)))))
-      value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0)
+      value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds()/sectoyear,p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0)
       #print(i,value,klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0))
     
     return value
 
-# def lamInt2(t,x,y,theta):
-#     (nu,A,alpha,c,p,d)=theta    
-#     value=mu(x,y,nu)
-
-#     t= mindate+ timedelta(seconds=t)
-    
-    
-#     for Record in Datos.loc[Fechas<t].index:
-#       Mag=Datos["Magnitude"].loc[Record]
-#       Lat=Datos["Latitude"].loc[Record]
-#       Lon=Datos["Longitude"].loc[Record]
-#       #value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*(1/(2*np.pi*d*np.exp(alpha*(Mag-M0)))*np.exp(-((x-Lat)**2+(y-Lon)**2)/(2*d*np.exp(alpha*(Mag-M0)))))
-#       value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0)
-#       #print(i,value,klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0))
-    
-#     return value
 
 
 
@@ -196,24 +168,11 @@ def likelihhod(thetalike):
 
     suma=np.sum(results)
 
-    # suma=0
-    # for i in range(len(Datos)):
-    #     suma+=mp.log(lam(i))      
-    # suma=np.sum(np.log(np.vectorize(lam)(np.arange(len(Datos)))))
-
-        #print(i,suma)
-    
-    #muint=lambda x,y: float(mu(x,y,nu))
-    
     integrated=muintegrated*nu
-    integral= mp.fadd(integrated,np.sum( fvaluesint[1:]*(1-mp.power(c,(p-1))*(DiferenciasMax[1:]+c)**(1-p))*np.vectorize(klik)(Datos["Magnitude"])[1:]))
+    integral= mp.fadd(integrated,np.sum( fvaluesint[1:]*(1-mp.power(c,(p-1))*(DiferenciasMax[1:]/sectoyear+c)**(1-p))*np.vectorize(klik)(Datos["Magnitude"])[1:]))
     
     lik=mp.fadd(suma, - integral)
     
-    # print(lik,suma, integral, integrated, "\n", thetalike)
-    
-    # if np.isinf(lik):
-    #     return -10**10
         
     return lik
 
@@ -225,8 +184,8 @@ def rhoij(i,j):
   Lonx=Datos["Longitude"].loc[i]
   Lat=Datos["Latitude"].loc[j]
   Lon=Datos["Longitude"].loc[j]
-  # num=klam(Mi,A,alpha,M0)*g((tj-ti).total_seconds(),p,c)*f(i,j,Mi, d,alpha,M0)
-  num=(klam(Mi,A,alpha,M0)*g((tj-ti).total_seconds(),p,c)*fint(Lat-Latx,Lon-Lonx,Mi, d,alpha,M0))
+
+  num=(klam(Mi,A,alpha,M0)*g((tj-ti).total_seconds()/sectoyear,p,c)*fint(Lat-Latx,Lon-Lonx,Mi, d,alpha,M0))
   return num
 ##############Calculate d_j
 
@@ -243,9 +202,9 @@ def dj(j,rad):
 ##########################################################
 
 minradius=0.02
-nnp=20
+nnp=10
 M0=4
-#theta=(1,1,1,1,1,1)
+
 
 ##########################################################
 
@@ -264,20 +223,20 @@ djs[djs<minradius]=minradius
 
 
 
-Const=[]
+# Const=[]
 
-for i in range(6):
-    #Const.append([0.001,1000000000.])
-    Const.append([0+10**(-100),np.infty])
-Const[-2][0]=1+10**(-100)
+# for i in range(6):
+#     #Const.append([0.001,1000000000.])
+#     Const.append([0+10**(-100),np.infty])
+# Const[-2][0]=1+10**(-10)
 
 
-# Const=[[0, 1000], #nu
-#   [0.01, 10 ],#A
-#   [0.05, 1.5],#alpha
-#   [0+10**(-3), 1],#c
-#   [1+10**(-4), 1.5],#p
-#   [0+10**(-3), 10**(-1)]]#d
+Const=[[0, 1000], #nu
+  [0.01, 100 ],#A
+  [0.05, 1.5],#alpha
+  [0+10**(-3), 10**5],#c
+  [1+10**(-10), 10],#p
+  [0+10**(-3), 10**(-1)]]#d
 
 ######Inicial
 
@@ -305,14 +264,14 @@ likelihhod(thetaopt)
 for i in range(10):
     #thetaopt=(1,A,alpha,c,p,d)
     #Optimizacion=sp.optimize.minimize(lambda theta: -likelihhod(theta),thetaopt,bounds=Const, method= "Nelder-Mead" )
-    # thetaopt=(1,A,alpha,c,p,d)
-    thetaopt=(1,0.3,0.01,0.89,1.16,0.002)
+    thetaopt=(1,A,alpha,c,p,d)
+    # thetaopt=(1,0.3,0.01,0.89,1.16,0.002)
     Optimizacion=sp.optimize.minimize(lambda theta: -likelihhod(theta),thetaopt, bounds=Const, method= "Nelder-Mead" )
     print(Optimizacion)
     nu,A,alpha,c,p,d=Optimizacion["x"]
     thetaopt=Optimizacion["x"]
     # lam=lambda t,x,y: lamInt2(t,x,y,thetaopt)
-
+    
     
     rhojs=np.zeros(len(Datos))
     for j in range(len(Datos)):
@@ -325,7 +284,7 @@ for i in range(10):
           
       else :
           rhojs[j]=0
-    # print(rhojs)
+    print(rhojs)
     
     plt.figure()
     plt.hist(rhojs)
@@ -347,7 +306,7 @@ for i in range(10):
         lat=Datos["Latitude"].loc[j]
         lon=Datos["Longitude"].loc[j]
         #suma+=np.exp(-((x-lat)**2+(y-lon)**2)/(2*djs[j]**2))/(2*djs[j]*np.pi)
-        suma+=(1-rhojs[j])*mp.exp(-((x-lat)**2+(y-lon)**2)/(2*djs[j]**2))/(2*(djs[j])**2*np.pi)
+        suma+=(1-rhojs[j])*mp.exp(-((x-lat)**2+(y-lon)**2)/(2*djs[j]**2))/(2*np.pi*djs[j]**2)
         if suma<0:
             print(j)
     
@@ -376,35 +335,17 @@ for i in range(10):
     # plt.contourf(X, Y, uxy)
     plt.colorbar()
     plt.scatter(Datos["Latitude"],Datos["Longitude"])
-    plt.title(r"$\hat{\mu}(x,y)$")
+    plt.title(r"$\log\hat{\mu}(x,y)$")
     #ax.set_title('Filled Contour Plot')
     #ax.set_xlabel('feature_x')
     #ax.set_ylabel('feature_y')
     plt.show()
     
     
-    # plt.figure()
-    # j=0
-    # size=1000
-    # grafica=np.ones(size)
-    # sop=np.arange(size)/size*Tmax
-    # for i in sop:
-    #     grafica[j]=lam(i, (latmax+latmin)/2,(lonmax+lonmin)/2)
-    #     j+=1
-    #     #print(j)
-        
-        
-        
-    # # plt.plot(sop,np.log10(grafica))
-    # plt.plot(sop,(grafica))
-    # plt.axvline(x = Diferencias[12], color = 'b', label = 'axvline - full height')
-    # plt.title(str(Optimizacion["fun"])+ str(thetaopt))
-    # plt.show()
-    
     
 
     # muintegrated=mp.quad(lambda x,y: Tmax*u(x,y), [latmin, latmax], [lonmin, lonmax])
-    muintegrated=np.sum(np.vectorize(lambda i: fintegrated2(i,djs[i]))(np.arange(len(Datos)))*(1-rhojs))#Tmax
+    muintegrated=np.sum(np.vectorize(lambda i: fintegrated2(i,djs[i]))(np.arange(len(Datos)))*(1-rhojs))##Tmax
     print("integral", muintegrated)
     ubar=np.vectorize(lambda i: u(Datos["Latitude"][i],Datos["Longitude"][i]))(np.arange(len(Datos)))
     # mp.mpmathify(Tmax*sp.integrate.dblquad(u, latmin, latmax, lonmin, lonmax)[0])
@@ -422,64 +363,11 @@ def lamt(t):
     value=muintegrated/Tmax
     for Record in Datos.loc[Fechas<t].index:
         Mag=Datos["Magnitude"].loc[Record]
-        value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fvaluesint[Record]
+        value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds()/sectoyear,p,c)*fvaluesint[Record]
     return float(value)
 
-sop=np.arange(100)*Tmax/100
+sop=np.arange(100)*Tmax/100*sectoyear
 evalua=np.vectorize(lamt)(sop)
 plt.plot(sop,evalua/(muintegrated/Tmax))
 plt.ylabel("$p(t)$")
 plt.xlabel("$t$")
-
-
-
-
-
-
-
-# inicio=datetime.now()
-# suma=0
-# for i in range(len(Datos)):
-#     suma+=mp.log(lam(i))      
-# final=datetime.now()
-
-# print(suma,final-inicio)
-
-
-
-
-
-# inicio=datetime.now()
-# suma=np.sum(np.log(np.vectorize(lam)(np.arange(len(Datos)))))
-# final=datetime.now()
-# print(suma,final-inicio)
-
-
-
-
-
-inicio=datetime.now()
-p = get_context("fork").Pool(cpu_count() - 1)
-results = p.map(lam2, np.arange(len(Datos)))
-p.close()
-final=datetime.now()
-print(final-inicio)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
