@@ -371,3 +371,38 @@ evalua=np.vectorize(lamt)(sop)
 plt.plot(sop,evalua/(muintegrated/Tmax))
 plt.ylabel("$p(t)$")
 plt.xlabel("$t$")
+
+
+
+
+
+
+# inicio=datetime.now()
+# suma=0
+# for i in range(len(Datos)):
+#     suma+=mp.log(lam(i))      
+# final=datetime.now()
+
+# print(suma,final-inicio)
+
+
+
+
+
+# inicio=datetime.now()
+# suma=np.sum(np.log(np.vectorize(lam)(np.arange(len(Datos)))))
+# final=datetime.now()
+# print(suma,final-inicio)
+
+
+
+
+
+# inicio=datetime.now()
+# p = get_context("fork").Pool(cpu_count() - 1)
+# results = p.map(lam2, np.arange(len(Datos)))
+# p.close()
+# final=datetime.now()
+# sprint(final-inicio)
+
+
