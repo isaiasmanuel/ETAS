@@ -1,4 +1,6 @@
 
+    
+
 from mpmath import mp
 import numpy as np
 import pandas as pd
@@ -13,12 +15,14 @@ from multiprocessing import Pool, cpu_count, get_context, Process
 ################ Read data
 
 Datos=pd.read_csv('/Users/isaias/Desktop/hypo_MASUB.csv',delimiter=",")
-anio=2003
+anio=2004
 Datos=Datos.loc[ Datos["Year"]<anio]
 Datos.loc[0]
 
 
+S=1 #Extra size of the square
 sectoyear=86400
+
 
 ################ Dates and distances
 
@@ -31,9 +35,28 @@ for i in range(len(Datos)):
 
 Dist=sp.spatial.distance_matrix(Datos[["Longitude","Latitude"]], Datos[["Longitude","Latitude"]], p=2, threshold=1000000)
 Dist=Dist**2
+
+Dist[0,1]
+
+np.sum((Datos[["Longitude","Latitude"]].loc[0]-Datos[["Longitude","Latitude"]].loc[1])**2)
+######
+# import geopy.distance
+
+# Dist=np.zeros((len(Datos),len(Datos)))
+# for i in range(len(Datos)):
+#     for j in np.arange(i,len(Datos)):
+#         val=geopy.distance.geodesic(Datos[["Latitude","Longitude"]].loc[i], Datos[["Latitude","Longitude"]].loc[j]).km
+#         Dist[i,j]=val
+#         Dist[j,i]=val
+
+# Dist=Dist**2
+
+######
 plt.matshow(Dist)
 plt.colorbar()
 plt.show()
+######
+
 
 
 mindate=np.min(Fechas)
@@ -46,10 +69,10 @@ np.max(Fechas)
 
 
 Tmax=(maxdate-mindate).total_seconds()/sectoyear
-latmin=np.min(Datos["Latitude"])-1
-latmax=np.max(Datos["Latitude"])+1
-lonmin=np.min(Datos["Longitude"])-1
-lonmax=np.max(Datos["Longitude"])+1
+latmin=np.min(Datos["Latitude"])-S
+latmax=np.max(Datos["Latitude"])+S
+lonmin=np.min(Datos["Longitude"])-S
+lonmax=np.max(Datos["Longitude"])+S
 
 
 print(maxdate-mindate)
@@ -116,9 +139,6 @@ def fintegrated2(i,d):
     return cum1-cum2-cum3+cum4
 
 
-
-
-
 def lamInt(obs,theta):
     
     x=Datos["Latitude"].loc[obs]
@@ -173,7 +193,7 @@ def likelihhod(thetalike):
     
     lik=mp.fadd(suma, - integral)
     
-        
+    #print(integral)
     return lik
 
 ############# Calculate rho
@@ -377,6 +397,7 @@ plt.xlabel("$t$")
 
 
 
+
 # inicio=datetime.now()
 # suma=0
 # for i in range(len(Datos)):
@@ -403,6 +424,34 @@ plt.xlabel("$t$")
 # results = p.map(lam2, np.arange(len(Datos)))
 # p.close()
 # final=datetime.now()
-# sprint(final-inicio)
+# print(final-inicio)
+
+
+
+# inicio=datetime.now()
+# value=0
+# Record=0
+# for Record in Datos.loc[Fechas<t].index:
+#   Mag=Datos["Magnitude"].loc[Record]
+#   Lat=Datos["Latitude"].loc[Record]
+#   Lon=Datos["Longitude"].loc[Record]
+#   #value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*(1/(2*np.pi*d*np.exp(alpha*(Mag-M0)))*np.exp(-((x-Lat)**2+(y-Lon)**2)/(2*d*np.exp(alpha*(Mag-M0)))))
+#   value+=klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds()/sectoyear,p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0)
+#   #print(i,value,klam(Mag,A,alpha,M0)*g((t-Fechas[Record]).total_seconds(),p,c)*fint(x-Lat,y-Lon,Mag, d,alpha,M0))
+# final=datetime.now()
+# print(value,final-inicio)
+
+# inicio=datetime.now()
+# aux=lambda Record: klam(Datos["Magnitude"].loc[Record],A,alpha,M0)*g((t-Fechas[Record]).total_seconds()/sectoyear,p,c)*fint(x-Datos["Latitude"].loc[Record],y-Datos["Longitude"].loc[Record],Datos["Magnitude"].loc[Record], d,alpha,M0)
+# value+=np.sum(np.vectorize(aux)(Datos.loc[Fechas<t].index))
+# final=datetime.now()
+# print(value,final-inicio)
+
+
+
+
+
+
+
 
 
