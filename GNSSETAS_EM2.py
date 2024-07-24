@@ -38,6 +38,10 @@ try:
 except:
     os.chdir('/Users/isaias/Desktop/GNSS')
 
+try :
+    os. mkdir("./figures")
+except:
+    pass
 ############# Define useful functions
 M0=4.5
 
@@ -48,7 +52,6 @@ def fintegrated(i,alpha,d,Lat,Lon):
     cum2=multivariate_normal.cdf((latmin,lonmax), mean=(Lat,Lon), cov=cov)
     cum3=multivariate_normal.cdf((latmax,lonmin), mean=(Lat,Lon), cov=cov)
     cum4=multivariate_normal.cdf((latmin,lonmin), mean=(Lat,Lon), cov=cov)
-    
     return cum1-cum2-cum3+cum4
 
 
@@ -56,36 +59,23 @@ def fintegrated(i,alpha,d,Lat,Lon):
 def klam(M,A,alpha,M0):
     return A*mp.exp(alpha*(M-M0))
 
-
- 
-
 def fint(x,y,M, d,alpha,M0):
-  return 1/(2*np.pi*d*mp.exp(alpha*(M-M0)))*mp.exp(-(x**2+y**2)/(2*d*np.exp(alpha*(M-M0))))
+    return 1/(2*np.pi*d*mp.exp(alpha*(M-M0)))*mp.exp(-(x**2+y**2)/(2*d*np.exp(alpha*(M-M0))))
 
 
 
 def g(t,p,c):
-  return (p-1)*mp.power(c,p-1)*mp.power(t+c,-p)*(t>0)
-
-
-
+    return (p-1)*mp.power(c,p-1)*mp.power(t+c,-p)*(t>0)
 
 
 def RecuperaBloque(Longitude,Latitude):
-
     for i in np.arange(mu0.shape[0]):
         for j in np.arange(mu0.shape[1]):
             # print(i,j)
             # print(len(Datos[(DomX[j]<Datos["Longitude"])*(DomX[j+1]>=Datos["Longitude"])*(DomY[i]<Datos["Latitude"])*(DomY[i+1]>=Datos["Latitude"])]))
             Eleccion=(DomX[j]<=Longitude)*(DomX[j+1]>=Longitude)*(DomY[i]<=Latitude)*(DomY[i+1]>=Latitude)
-            
-            
             if Eleccion==1:
                 return (i,j)
-
-i=1
-j=0
-
 
 def lam(i):
     xObs,yObs,MObs=Datos.loc[i][["Latitude","Longitude","Magnitude"]]
@@ -94,7 +84,7 @@ def lam(i):
     Bloque=RecuperaBloque(yObs,xObs) 
     
     muxy=mu0[Bloque]*(PII[i,0])+mu1[Bloque]*(PII[i,1])+mu2[Bloque]*(PII[i,2])+mu3[Bloque]*(PII[i,3])#+mu4[Bloque]*(PII[i,4])
-
+    
     nu=0
     nu=np.zeros(0)
     for j in np.arange(i):
@@ -102,12 +92,8 @@ def lam(i):
         
         # nu+= klam(M2,A,alpha,M0)*fint(xObs-Lat,yObs-Lon,Mag, d,alpha,M0)*g((t-Fechas[j]).total_seconds()/sectoday,p,c)
         nu=np.hstack((nu,klam(M2,A,alpha,M0)*fint(xObs-Lat,yObs-Lon,M2, d,alpha,M0)*g((t-Fechas[j]).total_seconds()/sectoday,p,c))) #Puede que haya error, cotegar si es MObs o M2
-
+        
     return muxy,nu
-
-
-
-
 
 def likelihhod(thetalike):
     A,alpha,c,p,d=np.copy(thetalike)
@@ -137,9 +123,6 @@ def likelihhod(thetalike):
     thetaIteracion=np.copy(thetalike)
     return value 
 
-
-
-
 ################ Hyperparameter
 
 mindate=datetime(2000, 1,1)
@@ -150,14 +133,14 @@ maxdate=datetime(anio, 1,1)
 file_path = './CAYA_2000-2021_GAMIT.dat'
 # file_path = '/Users/isaias/Desktop/PINO_GAMIT.dat'
 
- 
+
 
 GNSSData=np.ones(9)
 with open(file_path, 'r') as file:
     for line in file:
         GNSSData=np.vstack((GNSSData,np.fromstring((line.strip()).replace("  ", " "), sep=" ")))
         # print(np.fromstring((line.strip()).replace("  ", " "), sep=" ") )
-        
+
 GNSSData=GNSSData[1:,:]
 
 GNSSData=GNSSData[GNSSData[:,0]<anio]
@@ -194,7 +177,7 @@ Diferencias=np.zeros(len(Fechas))
 
 for i in range(len(Diferencias)):
     Diferencias[i]=(Fechas[i]-mindate).total_seconds()
-    
+
 
 ############### Exploring data
 # plt.plot(GNSSDif,GNSSData[:,3])    
@@ -204,17 +187,15 @@ for i in range(len(Diferencias)):
 # plt.scatter(Diferencias,np.cumsum(np.log(Datos["Magnitude"]))) 
 
 S=1 #Extra size of the square
-    
+
 latmin=np.min(Datos["Latitude"])-S
 latmax=np.max(Datos["Latitude"])+S
 lonmin=np.min(Datos["Longitude"])-S
 lonmax=np.max(Datos["Longitude"])+S    
 
 
-    
-################ Read data Epicenter
 
-    
+################ Read data Epicenter
 
 x=GNSSDif/sectoday
 y=GNSSData[:,3] 
@@ -247,23 +228,16 @@ DominioInt=np.zeros(0,dtype=int)
 flag=2
 flagN=-1
 for i in range(len(cumsum)-1):
-    #i=338
     if cumsum[i]==cumsum[i+1] and flag!=1:
         flag=1
-                
     if flag!=0 and  (cumsum[i]==cumsum[i+1]-1):
         flag=0
-        
     if flagN!=flag:
-        
         DominioInt=np.append(DominioInt,i)
         flagN=flag
 
-
 DominioInt=np.unique(DominioInt[:100])
 DominioInt=DominioInt[1:]
-
-
 
 plt.plot(GNSSDate,y,color="orange")
 plt.plot(GNSSDate,ynew)
@@ -271,7 +245,7 @@ plt.scatter(GNSSDate[yder<0],100*np.abs(yder[yder<0]),s=0.5)
 
 for i in range(len(DominioInt)):
     plt.axvline(GNSSDate[DominioInt][i])
-    
+
 # plt.plot(GNSSDate,ynew)
 # plt.plot(Fechas,PII[:,1])
 
@@ -279,9 +253,6 @@ for i in range(len(DominioInt)):
 # x[DominioInt][0::2]
 # x[DominioInt][1::2]
 ###############################################################################Algorithm 1 Fox
-
-
-
 PII=np.zeros((len(Fechas),len(DominioInt)//2+1))
 PII[:,0]=1/(np.arange(len(Fechas))+1)
 
@@ -315,13 +286,7 @@ for i in range(len(DomX)):
 
 DeltaX=DomX[1]-DomX[0]
 DeltaY=DomY[1]-DomY[0]
-
-
-
-
 ###############################################################################
-
-
 mu0=np.zeros((npartY-1,npartX-1))
 mu1=np.zeros((npartY-1,npartX-1))
 mu2=np.zeros((npartY-1,npartX-1))
@@ -336,8 +301,6 @@ for i in range(len(DominioInt)//2):
 
 
 ###############################################################################
-
-
 thetaopt=(0.05,
           1.5,
           0.02,
@@ -347,22 +310,17 @@ thetaopt=(0.05,
 
 A,alpha,c,p,d=thetaopt
 
-
-
-
-# Const=[[10**(-10), 10**(2) ],#A
-#   [10**(-10), 2],#alpha
-#   [10**(-10), 10],#c
-#   [1+1*10**(-10), 10],#p
-#   [0+10**(-10), 10**(2)]]#d
-
-Const=[[10**(-2), 10**(2) ],#A
-  [10**(-10), 3],#alpha
+Const=[[10**(-10), 10**(2) ],#A
+  [10**(-10), 2],#alpha
   [10**(-10), 10],#c
   [1+1*10**(-10), 10],#p
   [0+10**(-10), 10**(2)]]#d
 
-
+# Const=[[10**(-2), 10**(2) ],#A
+#   [10**(-10), 3],#alpha
+#   [10**(-10), 10],#c
+#   [1+1*10**(-10), 10],#p
+#   [0+10**(-10), 10**(2)]]#d
 
 ###############################################################################
 ###############################################################################
@@ -384,9 +342,6 @@ for s in range(40):
             mu2[i,j]=np.sum(Eleccion[:,2])/(DeltaX*DeltaY*T0[2])
             mu3[i,j]=np.sum(Eleccion[:,3])/(DeltaX*DeltaY*T0[3])
             #mu4[i,j]=np.sum(Eleccion[:,4])/(DeltaX*DeltaY*T0[4])  ####Descomentar si es hasta 2017
-
-    
-    
     MAX=np.max(np.hstack((mu0,mu1,mu2,mu3))) #Falta mu4    
     MIN=np.min(np.hstack((mu0,mu1,mu2,mu3))) #Falta mu4    
     # plt.imshow(mu0[:,::-1], extent=[DomX[0],DomX[1],DomY[0],DomY[1]],aspect=DeltaX/DeltaY)
@@ -394,57 +349,45 @@ for s in range(40):
     axs[0, 0].set_title('mu0')
     im1=axs[0, 0].imshow(mu0[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=np.min(MIN,0),vmax=MAX)
     plt.colorbar(im1)
-    
     axs[0,0].scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.1,color="red")
     axs[0, 1].set_title('mu1')
-    axs[0, 1].imshow(mu1[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
-    
+    axs[0, 1].imshow(mu1[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)    
     axs[1, 0].set_title('mu3')
     axs[1, 0].imshow(mu3[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
-     
     if np.sum(mu4!=0):
         axs[1, 1].set_title('mu4')
         axs[1, 1].imshow(mu4[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
     else :
         axs[1, 1].set_title('$P_{ii}$')
         axs[1, 1].hist(np.apply_along_axis(sum, 1,PII))
-
     axs[0, 2].set_title('mu2')
     axs[0, 2].imshow(mu2[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
     axs[1, 2].set_title('PIJ')
     axs[1, 2].imshow((PIJ[:100,:100]))
     fig.show()
+    fig.tight_layout()
+    fig.savefig("./figures/"+str(s)+"a.jpg", dpi=250)
     plt.show()
-    
-    plt.plot()
+    plt.figure(2)
     plt.imshow((PIJ[:100,:100]))
     plt.colorbar()
+    plt.tight_layout()
+    plt.savefig("./figures/"+str(s)+"b.jpg", dpi=250)
     plt.show()
-    
-    plt.plot()
+    plt.figure(3)
     plt.scatter(np.arange(len(PIJ)),np.apply_along_axis(sum, 0,PIJ))
     plt.title(thetaopt)
+    plt.tight_layout()
+    plt.savefig("./figures/"+str(s)+"c.jpg", dpi=250)
     plt.show()
-
-    
     ###############################################################################
-        
-    
-    
-    
     Optimizacion=minimize(lambda theta: -likelihhod(theta),thetaopt, bounds=Const, method="Nelder-Mead",tol=1e-6 )#"Nelder-Mead"  "Powell" "L-BFGS-B"
     print(Optimizacion)
     A,alpha,c,p,d=Optimizacion["x"]
-    
-    
     # Optimo=thetaIteracion
     # A,alpha,c,p,d=Optimo
     # A,alpha,c,p,d=[0.00531568, 0.6095514,  0.02656009 ,1.99870522 ,0.00608718] 
     thetaopt=(A,alpha,c,p,d)
-    
-    
-    
-    
     for i in range(len(PII)):
         xObs,yObs,MObs=Datos.loc[i][["Latitude","Longitude","Magnitude"]]
         t=Fechas[i]
@@ -456,12 +399,8 @@ for s in range(40):
         PII[i,2]=mu2[Bloque]/(lamObs)*(PII[i,2]!=0)*(PII[i,2])
         PII[i,3]=mu3[Bloque]/(lamObs)*(PII[i,3]!=0)*(PII[i,3])
         #PII[i,4]=mu4[Bloque]/(lamObs)*(PII[i,4]!=0)*(PII[i,4])
-    
-    
         for j in np.arange(i):
             PIJ[i,j]=nu[j]/lamObs
-    
-
 
 np.apply_along_axis(sum, 1,PIJ)+np.apply_along_axis(sum, 1,PII)
 
@@ -470,41 +409,16 @@ np.savetxt("PIJ.csv", PIJ, delimiter=",")
 np.savetxt("thetaopt.csv", thetaopt, delimiter=",")
 
 ########No usar la aproximacion, falta restar en likelihood los parametros
-
-
-
-
-
 # plt.plot()
 # plt.scatter(np.arange(len(PII)),np.apply_along_axis(sum, 1,PII))
 # plt.show()
-
-
-
 # part=10
-
-# for i in range(len(PIJ)//part+1):
-#     plt.plot()
-#     plt.imshow(((PIJ[i*part:(i+1)*part,i*part:(i+1)*part])),vmin=0,vmax=1,extent=[i*part,(i+1)*part,(i+1)*part,i*part])
-#     plt.colorbar()
-#     plt.savefig("./Genealogia/"+str(i)+".jpg", dpi=250)
-#     plt.show()
     
 
-import plotly.express as px
-import numpy as np
 
-fig = px.imshow(PIJ)
-fig.show()
-
-
-
-Datos.loc[94:97]
-Datos.loc[50]
-Datos.loc[84]
-
-Datos[Datos["Magnitude"]==7.6]
-
+fig2 = px.imshow(PIJ)
+fig2.show()
+fig2.write_html("./figure/"+str(i)+".html")
 
 
 
