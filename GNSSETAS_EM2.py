@@ -43,7 +43,7 @@ try :
 except:
     pass
 ############# Define useful functions
-M0=4.5
+M0=4.3
 
 
 def fintegrated(i,alpha,d,Lat,Lon):
@@ -121,7 +121,7 @@ def likelihhod(thetalike):
     print(thetalike,"\n", value)
     global thetaIteracion
     thetaIteracion=np.copy(thetalike)
-    return value 
+    return value
 
 ################ Hyperparameter
 
@@ -418,7 +418,7 @@ np.savetxt("thetaopt.csv", thetaopt, delimiter=",")
 
 fig2 = px.imshow(PIJ)
 fig2.show()
-fig2.write_html("./figure/"+str(i)+".html")
+fig2.write_html("./figure/Genealogy"+".html")
 
 
 
