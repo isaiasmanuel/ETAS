@@ -19,15 +19,12 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import time
 from multiprocessing import Pool, cpu_count, get_context, Process
-import numpy as np
-import matplotlib.pyplot as plt
 from scipy import interpolate
 import plotly.io as pio
 import plotly.graph_objs as go
 pio.renderers.default='browser'
 import plotly.express as px
 from scipy.optimize import minimize
-from multiprocessing import Pool, cpu_count, get_context, Process
 from scipy.stats import multivariate_normal
 import os
 try:
@@ -39,6 +36,8 @@ try :
     os. mkdir("./figures")
 except:
     pass
+
+plt.rcParams['figure.dpi'] = 300
 
 ############# Define useful functions
 
@@ -121,7 +120,8 @@ def likelihhod(thetalike):
     indmax=Datos[Datos["Magnitude"]==np.max(Datos["Magnitude"])].index[0]
     LatMax=Datos["Latitude"].loc[indmax]
     LonMax=Datos["Longitude"].loc[indmax]
-    return value-100000*((1-mp.power(c,(p-1))*((10+c)**(1-p)))-1)**2-100*(klam(7.6,A,alpha,M0)-15)**2-10000*(fintegrated2(indmax,alpha,d,LatMax,LonMax,1)-1)**2
+    # return value#-100000*((1-mp.power(c,(p-1))*((10+c)**(1-p)))-1)**2-100*(klam(7.6,A,alpha,M0)-15)**2-10000*(fintegrated2(indmax,alpha,d,LatMax,LonMax,1)-1)**2
+    return value-10_000*((1-mp.power(c,(p-1))*((10+c)**(1-p)))-1)**2-10_000*(fintegrated2(indmax,alpha,d,LatMax,LonMax,1)-1)**2#-1*(klam(7.6,A,alpha,M0)-15)**2
 
 ################ Hyperparameter
 mindate=datetime(2000, 1,1)
@@ -208,7 +208,7 @@ DominioInt=np.unique(DominioInt[:100])
 DominioInt=DominioInt[1:]
 plt.plot(GNSSDate,y,color="orange")
 plt.plot(GNSSDate,ynew)
-plt.scatter(GNSSDate[yder<0],100*np.abs(yder[yder<0]),s=0.5)
+# plt.scatter(GNSSDate[yder<0],100*np.abs(yder[yder<0]),s=0.5)
 for i in range(len(DominioInt)):
     plt.axvline(GNSSDate[DominioInt][i])
 
@@ -227,18 +227,31 @@ for i in range(len(Fechas)):
     for j in np.arange(i):
         PIJ[i,j]=1/(i+1)
 
+
+Trench=pd.read_csv('./trench_cocos.csv', delimiter=',')
+
+
+
 npartX=20
 npartY=20
 DomX=np.min(Datos["Longitude"])+np.arange(npartX)/(npartX-1)*(np.max(Datos["Longitude"])-np.min(Datos["Longitude"]))
 DomY=np.min(Datos["Latitude"])+np.arange(npartY)/(npartY-1)*(np.max(Datos["Latitude"])-np.min(Datos["Latitude"]))
 M=Datos["Magnitude"]
-plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5)
+
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
 for i in range(len(DomX)):
-    plt.axvline(DomX[i])
-    plt.axhline(DomY[i])
+    plt.axvline(DomX[i],color="firebrick",alpha=0.5)
+    plt.axhline(DomY[i],color="firebrick",alpha=0.5)
+plt.plot(Trench["x"],Trench["y"],color="black")
+plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5)
+plt.ylabel("Latitude")
+plt.xlabel("Longitude")
 
 DeltaX=DomX[1]-DomX[0]
 DeltaY=DomY[1]-DomY[0]
+
+
 ###############################################################################
 mu0=np.zeros((npartY-1,npartX-1))
 mu1=np.zeros((npartY-1,npartX-1))
@@ -254,7 +267,7 @@ for i in range(len(DominioInt)//2):
 
 
 ###############################################################################
-thetaopt=(0.05,
+thetaopt=(0.05, #antes 0.04
           1.5,
           0.02,
           1.5,
@@ -262,18 +275,12 @@ thetaopt=(0.05,
 
 A,alpha,c,p,d=thetaopt
 
-Const=[[10**(-5), 10**(0)],#A
+Const=[[10**(-5), 10**(0)],#A 
 [0.5, 2],#alpha
 [10**(-3), 10**(1)],#c
 [1.1, 3],#p
-[0+10**(-10), 10**(-1)]]#d
+[0+10**(-10), 10**(-2)]]#d antes era -1 con este cambio no necesito penalizar la esperanza 
 
-
-# Const=[[10**(-10), 10**(2) ],#A
-#   [10**(-10), 2],#alpha
-#   [10**(-10), 10],#c
-#   [1+1*10**(-10), 10],#p
-#   [0+10**(-10), 10**(2)]]#d
 
 ###############################################################################
 ###############################################################################
@@ -369,39 +376,40 @@ np.apply_along_axis(sum, 1,PIJ)+np.apply_along_axis(sum, 1,PII)
 
 
 ########No usar la aproximacion, falta restar en likelihood los parametros
-# plt.plot()
-# plt.scatter(np.arange(len(PII)),np.apply_along_axis(sum, 1,PII))
-# plt.show()
-# part=10
-    
+
 
 
 fig2 = px.imshow(PIJ)
 fig2.show()
-fig2.write_html("./figure/Genealogy"+".html")
+fig2.write_html("./figures/Genealogy"+".html")
 
 
-
-# p=1.1
-# c=0.012
-# (1-mp.power(c,(p-1))*((10+c)**(1-p))-1)
-
-# alpha=1.03
-# d=0.03
-
-# for i in range(len(PII)):
-#     print(fintegrated2(i,alpha,d,xObs,yObs,0.5))
+# fig2 = px.imshow(PII)
+# fig2 = px.imshow(np.hstack((PII,np.zeros((len(PII),len(PII))))))
+# fig2.show()
+#fig2.write_html("./figures/Genealogy"+".html")
 
 
 
 
-# PIJ=np.loadtxt('/Users/isaias/figures/PIJ.csv', delimiter=',')
+# Extension='/Users/isaias/Desktop/figures/'
+# PII=np.loadtxt(Extension+'PII.csv', delimiter=',')
+# PIJ=np.loadtxt(Extension+'PIJ.csv', delimiter=',')
+# mu0=np.loadtxt(Extension+'mu0.csv', delimiter=',')
+# mu1=np.loadtxt(Extension+'mu1.csv', delimiter=',')
+# mu2=np.loadtxt(Extension+'mu2.csv', delimiter=',')
+# mu3=np.loadtxt(Extension+'mu3.csv', delimiter=',')
+# thetaopt=np.loadtxt(Extension+'thetaopt.csv', delimiter=',')
+
+# A,alpha,c,p,d=thetaopt
 
 
+# suma=np.sum(mu0*T0[0]+mu1*T0[1]+mu2*T0[2]+mu3*T0[3])*(DeltaX*DeltaY)
+# for i in Datos.index[1:]:
+#     xObs,yObs,MObs=Datos.loc[i][["Latitude","Longitude","Magnitude"]]
+#     t=Fechas[i]
+#     intg=(1-mp.power(c,(p-1))*(((maxdate-t).total_seconds())/sectoday+c)**(1-p))
+#     intf=fintegrated(j,alpha,d,xObs,yObs)
+#     suma+=klam(MObs,A,alpha,M0)*intg*intf
 
-
-
-
-
-
-
+# print(suma,len(PIJ))
