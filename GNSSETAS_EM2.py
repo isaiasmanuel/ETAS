@@ -179,7 +179,14 @@ lonmax=np.max(Datos["Longitude"])+S
 x=GNSSDif/sectoday
 y=GNSSData[:,3] 
 # y=sp.signal.detrend(y) #Detrend
-plt.plot(x,y)
+
+#############################
+plt.plot(GNSSDate,y)
+plt.xlabel("Date")
+plt.ylabel("Displacement (cm)")
+
+#############################
+
 tck = interpolate.splrep(x, y, s=0.03) #############################Tener cuidado si se cambia el soporte, 2017 era 0.5
 xnew = x
 ynew = interpolate.splev(xnew, tck, der=0)
@@ -208,9 +215,15 @@ DominioInt=np.unique(DominioInt[:100])
 DominioInt=DominioInt[1:]
 plt.plot(GNSSDate,y,color="orange")
 plt.plot(GNSSDate,ynew)
+
+
+plt.plot(GNSSDate,y)
+plt.plot(GNSSDate,ynew)
 # plt.scatter(GNSSDate[yder<0],100*np.abs(yder[yder<0]),s=0.5)
-for i in range(len(DominioInt)):
-    plt.axvline(GNSSDate[DominioInt][i])
+for i in range(len(DominioInt)-1):
+    plt.axvline(GNSSDate[DominioInt][i],color="firebrick")
+plt.xlabel("Date")
+plt.ylabel("Displacement (cm)")
 
 ###############################################################################Algorithm 1 Fox
 
@@ -379,7 +392,7 @@ np.apply_along_axis(sum, 1,PIJ)+np.apply_along_axis(sum, 1,PII)
 
 
 
-fig2 = px.imshow(PIJ)
+fig2 = px.imshow(PIJ,labels=dict(x="Index", y="Index"))
 fig2.show()
 fig2.write_html("./figures/Genealogy"+".html")
 
