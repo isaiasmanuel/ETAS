@@ -6,7 +6,7 @@ Created on Tue Jun  4 11:47:05 2024
 @author: isaias
 """
 
-
+#Run GNSSETAS_EM2 before
 
 from mpmath import mp
 import numpy as np
@@ -26,7 +26,7 @@ sectoday=86400
 anio=2017
 maxdate=datetime(anio, 1,1)
 ################ Read data GNSS
-file_path = '/Users/isaias/Desktop/CAYA_2000-2021_GAMIT.dat'
+file_path = './CAYA_2000-2021_GAMIT.dat'
 # file_path = '/Users/isaias/Desktop/PINO_GAMIT.dat'
 
  
@@ -194,57 +194,12 @@ x[DominioInt][0::2]
 x[DominioInt][1::2]
 
 
-# i=0
-# const=np.zeros(0)
-# duracion=np.zeros(0)
-# for i in range(len(DominioInt)//2):
-#     const=np.append(const,sp.integrate.cumtrapz( np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]), x[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])])[-1])
-#     duracion=np.append(duracion,np.diff(x[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])][[0,-1]]))
-# for i in range(len(DominioInt)//2):
-#     #plt.plot(x[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])],np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))
-#     #plt.plot(np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))
-#     plt.plot(np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])])/const[i])
-
-# for i in range(len(DominioInt)//2):
-#     #plt.plot(x[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])],np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))
-#     #plt.plot(np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))
-#     plt.plot((ynew[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))
-
-
 
 plt.scatter(xnew[yder<0],np.abs(yder[yder<0]))
 
 
 
-# const
-# duracion
-# np.diff(DominioInt[0::2])
-# np.mean(np.diff(DominioInt[0::2]))
-# np.sqrt(np.var(np.diff(DominioInt[0::2])))
 
-# plt.scatter(duracion,np.diff(DominioInt[0::2]))
-# plt.scatter(duracion,const)
-# plt.scatter(np.diff(DominioInt[0::2]),const)
-
-
-
-# i=0
-# const=np.zeros(0)
-
-# for i in range(len(DominioInt)//2):
-#     sop=np.arange(0,len(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))/len(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])])
-#     const=np.append(const,sp.integrate.cumtrapz( np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]), sop)[-1])
-
-
-# for i in range(len(DominioInt)//2):
-#     sop=np.arange(0,len(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])]))/len(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])])
-#     plt.plot(sop,np.abs(yder[np.arange(DominioInt[0::2][i],DominioInt[1::2][i])])/const[i])
-
-
-# a, b = 2,2
-# plt.plot(sop,sp.stats.beta.pdf(sop,a, b),color="black")
-    
-    
     
 #############################    
     
@@ -314,19 +269,35 @@ for i in range(len(Datos)):
             
         if flag==1:
             ax1=p.plot(ax=ax1,alpha=0.3)#p.plot(alpha=0.3)
+            ax1.set_xlabel("Longitude")    
+            ax1.set_ylabel("Latitude")    
+            ax1.set_xlim(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))    
+            ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))    
+            ax1.set_aspect('equal')        
+
 
         elif flag==2:
             ax1=p2.plot(ax=ax1,alpha=0.3)
+            ax1.set_xlabel("Longitude")    
+            ax1.set_ylabel("Latitude")    
+            ax1.set_xlim(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))    
+            ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))    
+            ax1.set_aspect('equal')        
+
 
         elif flag==3:
             ax1=p3.plot(ax=ax1,alpha=0.3)
+            ax1.set_xlabel("Longitude")    
+            ax1.set_ylabel("Latitude")    
+            ax1.set_xlim(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))    
+            ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))    
+            ax1.set_aspect('equal')        
+
         
 
         elif flag==4:
-            ax1=p4.plot(ax=ax1,alpha=0.3)
-        ax1.set_xlim(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))    
-        ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))    
-        ax1.set_aspect('equal')        
+            1
+            #ax1=p4.plot(ax=ax1,alpha=0.3)
         #plt.gca().set_aspect('equal')        
 
     
@@ -349,6 +320,8 @@ for i in range(len(Datos)):
     ax1.scatter(Long,Lat,Size, alpha=0.5)
     ax1.set_xlim(np.min(Datos["Longitude"]),np.max(Datos["Longitude"]))    
     ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))   
+    ax1.set_xlabel("Longitude")    
+    ax1.set_ylabel("Latitude")    
     ax1.set_aspect('equal')        
     #plt.gca().set_aspect('equal')
     ###############Branch structure
@@ -360,11 +333,12 @@ for i in range(len(Datos)):
     ################
     ax2.set_ylim(-1,1)
     ax2.plot(Fechas,np.zeros(len(Fechas)))
+    ax2.set_xlabel("Time")    
     ax2.axvline(Fechas[i])
     ax2.yaxis.set_visible(False)
     
 
-    fig.savefig("/Users/isaias/Desktop/SSE_GNSS/"+str(i)+".jpg", dpi=250)
+    fig.savefig("/Users/isaias/Desktop/SSE_GNSS/"+str(i)+".jpg", dpi=200)
     plt.show()    
 
         
@@ -377,40 +351,88 @@ imageio.mimsave('/Users/isaias/Desktop/movie.gif', images)
 
 
 ###############################
-
-M=Datos["Magnitude"]
-Size=(5+np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1))/10
-
-plt.scatter(Datos["Longitude"],Datos["Latitude"],s=Size)
-for j in range(len(PIJ)):
-    for s in range(len(PIJ)):
+ind=np.arange(183,193)
+#ind=Datos.index
+LongGraf=Datos.loc[ind]["Longitude"]
+LatGraf=Datos.loc[ind]["Latitude"]
+M2=Datos.loc[ind]["Magnitude"]
+Size=np.exp(5*(M2-np.min(M2))/(np.max(M2)-np.min(M2))+1)
+plt.xlim(np.min(LongGraf-0.1),np.max(LongGraf+0.1))
+plt.ylim(np.min(LatGraf-0.1),np.max(LatGraf+0.1))
+plt.plot(Trench["x"],Trench["y"],color="black")
+plt.scatter(LongGraf,LatGraf,s=Size,alpha=0.5)
+for j in ind:
+    for s in ind:
         if PIJ[s,j]>0.2:
             plt.annotate("", xy=Datos[["Longitude","Latitude"]].loc[s], xytext=Datos[["Longitude","Latitude"]].loc[j],arrowprops=dict(arrowstyle="->,head_width=0.1",alpha=PIJ[s,j]))
+            print(j,s,PIJ[s,j])
+
+PIJ[192,183]
+PIJ[s,j]
+################################
+ax1=p.plot(alpha=0.3)
+plt.xlim(-102.5,-96)
+plt.ylim(15,19.5)
+plt.plot(Trench["x"],Trench["y"],color="black")
+plt.ylabel("Latitude")
+plt.xlabel("Longitude")
+
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
+ax1=p2.plot(alpha=0.3)
+plt.plot(Trench["x"],Trench["y"],color="black")
+plt.xlim(-102.5,-96)
+plt.ylim(15,19.5)
+plt.ylabel("Latitude")
+plt.xlabel("Longitude")
+
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
+ax1=p3.plot(alpha=0.3)
+plt.xlim(-102.5,-96)
+plt.ylim(15,19.5)
+plt.plot(Trench["x"],Trench["y"],color="black")
+plt.ylabel("Latitude")
+plt.xlabel("Longitude")
 
 
+################################
 
+MAX=np.max(np.hstack((mu0,mu1,mu2,mu3))) #Falta mu4    
+MIN=np.min(np.hstack((mu0,mu1,mu2,mu3))) #Falta mu4    
+# plt.imshow(mu0[:,::-1], extent=[DomX[0],DomX[1],DomY[0],DomY[1]],aspect=DeltaX/DeltaY)
 
+plt.title('$\mu^0$')
+plt.imshow(mu0[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=np.min(MIN,0),vmax=MAX)
+plt.colorbar()
+plt.ylabel("Latitude")
+#plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.1)
 
+plt.title('$\mu^1$')
+plt.imshow(mu1[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)    
 
+plt.title('$\mu^2$')
+plt.imshow(mu2[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+plt.ylabel("Latitude")
+plt.xlabel("Longitude")
 
+plt.title('$\mu^3$')
+plt.imshow(mu3[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+plt.xlabel("Longitude")
 
+#################################
+fig3, axs = plt.subplots(nrows=1, ncols=1, figsize=(14, 8))
+axs.scatter(np.arange(len(PIJ)),np.apply_along_axis(sum, 0,PIJ))
+#axs.set_title(thetaopt)
+plt.xlabel("Index")
+plt.ylabel("Expected Aftershocks")
+################################
 
-
-
-
-
-
-
-
-
-
+plt.hist(np.apply_along_axis(sum, 1,PII))
+plt.xlabel('$\sum_{s=0}^3 {\hat{p}^s_{ii}}$')    
+plt.ylabel('Frequency')    
 
 
     
 
-
-
-    
-    
-    
-    
+###############################
