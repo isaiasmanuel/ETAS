@@ -333,7 +333,7 @@ for i in range(len(Datos)):
     ################
     ax2.set_ylim(-1,1)
     ax2.plot(Fechas,np.zeros(len(Fechas)))
-    ax2.set_xlabel("Time")    
+    ax2.set_xlabel("Date")    
     ax2.axvline(Fechas[i])
     ax2.yaxis.set_visible(False)
     
@@ -352,7 +352,7 @@ imageio.mimsave('/Users/isaias/Desktop/movie.gif', images)
 
 ###############################
 ind=np.arange(183,193)
-#ind=Datos.index
+# ind=Datos.index
 LongGraf=Datos.loc[ind]["Longitude"]
 LatGraf=Datos.loc[ind]["Latitude"]
 M2=Datos.loc[ind]["Magnitude"]
@@ -366,7 +366,8 @@ for j in ind:
         if PIJ[s,j]>0.2:
             plt.annotate("", xy=Datos[["Longitude","Latitude"]].loc[s], xytext=Datos[["Longitude","Latitude"]].loc[j],arrowprops=dict(arrowstyle="->,head_width=0.1",alpha=PIJ[s,j]))
             print(j,s,PIJ[s,j])
-
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
 PIJ[192,183]
 PIJ[s,j]
 ################################
