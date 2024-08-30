@@ -377,6 +377,8 @@ plt.ylim(15,19.5)
 plt.plot(Trench["x"],Trench["y"],color="black")
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
+ax1.grid()
+
 
 plt.xlim(DomX[0],DomX[-1])
 plt.ylim(DomY[0],DomY[-1])
@@ -386,6 +388,8 @@ plt.xlim(-102.5,-96)
 plt.ylim(15,19.5)
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
+ax1.grid()
+
 
 plt.xlim(DomX[0],DomX[-1])
 plt.ylim(DomY[0],DomY[-1])
@@ -395,7 +399,7 @@ plt.ylim(15,19.5)
 plt.plot(Trench["x"],Trench["y"],color="black")
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
-
+ax1.grid()
 
 ################################
 
