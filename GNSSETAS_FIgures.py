@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jun  4 11:47:05 2024
-
-@author: isaias
-"""
 
 #Run GNSSETAS_EM2 before
 
@@ -374,32 +367,66 @@ PIJ[s,j]
 ax1=p.plot(alpha=0.3)
 plt.xlim(-102.5,-96)
 plt.ylim(15,19.5)
-plt.plot(Trench["x"],Trench["y"],color="black")
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
-ax1.grid()
+
+shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
 
 
 plt.xlim(DomX[0],DomX[-1])
 plt.ylim(DomY[0],DomY[-1])
+for shape in shape.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y,color="black")
+
+
+
+
+
+
+
+plt.xlim(-102.5,-96)
+plt.ylim(15,19.5)
 ax1=p2.plot(alpha=0.3)
-plt.plot(Trench["x"],Trench["y"],color="black")
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
 plt.xlim(-102.5,-96)
 plt.ylim(15,19.5)
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
-ax1.grid()
+
+shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
 
 
 plt.xlim(DomX[0],DomX[-1])
 plt.ylim(DomY[0],DomY[-1])
+for shape in shape.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y,color="black")
+
+
+
+plt.xlim(-102.5,-96)
+plt.ylim(15,19.5)
 ax1=p3.plot(alpha=0.3)
 plt.xlim(-102.5,-96)
 plt.ylim(15,19.5)
-plt.plot(Trench["x"],Trench["y"],color="black")
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
-ax1.grid()
+
+shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
+for shape in shape.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y,color="black")
+
+
+
 
 ################################
 
@@ -441,3 +468,4 @@ plt.ylabel('Frequency')
     
 
 ###############################
+
