@@ -27,6 +27,9 @@ import plotly.express as px
 from scipy.optimize import minimize
 from scipy.stats import multivariate_normal
 import os
+import shapefile as shp
+
+
 try:
     os.chdir('/home/isaias.ramirez/')
 except:
@@ -235,6 +238,8 @@ for i in range(len(DominioInt)//2):
 
 ###############################################################################
 
+
+###############################################################################
 PIJ=np.zeros((len(Fechas),len(Fechas)))
 for i in range(len(Fechas)):
     for j in np.arange(i):
@@ -251,12 +256,20 @@ DomX=np.min(Datos["Longitude"])+np.arange(npartX)/(npartX-1)*(np.max(Datos["Long
 DomY=np.min(Datos["Latitude"])+np.arange(npartY)/(npartY-1)*(np.max(Datos["Latitude"])-np.min(Datos["Latitude"]))
 M=Datos["Magnitude"]
 
+shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
+
+
 plt.xlim(DomX[0],DomX[-1])
 plt.ylim(DomY[0],DomY[-1])
+for shape in shape.shapeRecords():
+    x = [i[0] for i in shape.shape.points[:]]
+    y = [i[1] for i in shape.shape.points[:]]
+    plt.plot(x,y,color="black")
+
 for i in range(len(DomX)):
     plt.axvline(DomX[i],color="firebrick",alpha=0.5)
     plt.axhline(DomY[i],color="firebrick",alpha=0.5)
-plt.plot(Trench["x"],Trench["y"],color="black")
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
 plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5)
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
@@ -426,3 +439,4 @@ fig2.write_html("./figures/Genealogy"+".html")
 #     suma+=klam(MObs,A,alpha,M0)*intg*intf
 
 # print(suma,len(PIJ))
+
