@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun  4 11:47:05 2024
+
+@author: isaias
+"""
 
 #Run GNSSETAS_EM2 before
 
@@ -315,7 +322,8 @@ for i in range(len(Datos)):
     ax1.set_ylim(np.min(Datos["Latitude"]),np.max(Datos["Latitude"]))   
     ax1.set_xlabel("Longitude")    
     ax1.set_ylabel("Latitude")    
-    ax1.set_aspect('equal')        
+    ax1.set_aspect('equal')       
+    ax1.plot(Trench["x"],Trench["y"],color="hotpink")
     #plt.gca().set_aspect('equal')
     ###############Branch structure
     PIJReduc=PIJ[Select,:][:,Select]
@@ -323,6 +331,16 @@ for i in range(len(Datos)):
         for s in range(len(PIJReduc)):
             if PIJReduc[s,r]>=0.2:
                 ax1.annotate("", xy=(Long[Long.index[s]],Lat[Long.index[s]]), xytext=(Long[Long.index[r]],Lat[Long.index[r]]),arrowprops=dict(arrowstyle="->,head_width=0.1",alpha=PIJReduc[s,r]))
+    
+        
+    shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
+    
+    
+    for shape in shape.shapeRecords():
+        x = [i[0] for i in shape.shape.points[:]]
+        y = [i[1] for i in shape.shape.points[:]]
+        ax1.plot(x,y,color="black")
+
     ################
     ax2.set_ylim(-1,1)
     ax2.plot(Fechas,np.zeros(len(Fechas)))
@@ -350,19 +368,35 @@ LongGraf=Datos.loc[ind]["Longitude"]
 LatGraf=Datos.loc[ind]["Latitude"]
 M2=Datos.loc[ind]["Magnitude"]
 Size=np.exp(5*(M2-np.min(M2))/(np.max(M2)-np.min(M2))+1)
+
+# shape=shp.Reader("./Mexico.shp") #http://geoportal.conabio.gob.mx/metadatos/doc/html/dest_2010gw.html
+
+# for shape in shape.shapeRecords():
+#     x = [i[0] for i in shape.shape.points[:]]
+#     y = [i[1] for i in shape.shape.points[:]]
+#     plt.plot(x,y,color="black",alpha=0.3)
 plt.xlim(np.min(LongGraf-0.1),np.max(LongGraf+0.1))
 plt.ylim(np.min(LatGraf-0.1),np.max(LatGraf+0.1))
-plt.plot(Trench["x"],Trench["y"],color="black")
+# plt.plot(Trench["x"],Trench["y"],color="hotpink")
+# plt.scatter(Reference[:,0],Reference[:,1],s=np.exp(5*(MRef-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5,color="Green")
+# for i in range(len(Reference)):
+#     plt.text(Reference[i,0]-0.2,Reference[i,1]+0.2, str(i+4.5))
+
 plt.scatter(LongGraf,LatGraf,s=Size,alpha=0.5)
 for j in ind:
     for s in ind:
         if PIJ[s,j]>0.2:
             plt.annotate("", xy=Datos[["Longitude","Latitude"]].loc[s], xytext=Datos[["Longitude","Latitude"]].loc[j],arrowprops=dict(arrowstyle="->,head_width=0.1",alpha=PIJ[s,j]))
             print(j,s,PIJ[s,j])
+
 plt.xlabel("Longitude")
 plt.ylabel("Latitude")
 PIJ[192,183]
 PIJ[s,j]
+
+
+
+
 ################################
 ax1=p.plot(alpha=0.3)
 plt.xlim(-102.5,-96)
@@ -435,22 +469,53 @@ MIN=np.min(np.hstack((mu0,mu1,mu2,mu3))) #Falta mu4
 # plt.imshow(mu0[:,::-1], extent=[DomX[0],DomX[1],DomY[0],DomY[1]],aspect=DeltaX/DeltaY)
 
 plt.title('$\mu^0$')
+
+
+              
+
 plt.imshow(mu0[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=np.min(MIN,0),vmax=MAX)
 plt.colorbar()
 plt.ylabel("Latitude")
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
 #plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.1)
 
-plt.title('$\mu^1$')
-plt.imshow(mu1[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)    
 
-plt.title('$\mu^2$')
-plt.imshow(mu2[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+
+
+ax1=p.plot(facecolor="none", edgecolor='white')
+ax1.set_title('$\mu^1$')
+ax1.imshow(mu1[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)    
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
+
+
+
+ax2=p2.plot(facecolor="none", edgecolor='white')
+ax2.set_title('$\mu^2$')
+ax2.imshow(mu2[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
 
-plt.title('$\mu^3$')
-plt.imshow(mu3[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+
+
+ax3=p3.plot(facecolor="none", edgecolor='white')
+ax3.set_title('$\mu^3$')
+ax3.imshow(mu3[::-1,:], extent=[DomX[0],DomX[-1],DomY[0],DomY[-1]],aspect=DeltaX/DeltaY,vmin=0,vmax=MAX)
+plt.plot(Trench["x"],Trench["y"],color="hotpink")
+plt.xlim(DomX[0],DomX[-1])
+plt.ylim(DomY[0],DomY[-1])
 plt.xlabel("Longitude")
+
+
+
+
+
 
 #################################
 fig3, axs = plt.subplots(nrows=1, ncols=1, figsize=(14, 8))
@@ -469,3 +534,26 @@ plt.ylabel('Frequency')
 
 ###############################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    
+    
+    
+    
