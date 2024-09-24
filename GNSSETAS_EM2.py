@@ -247,6 +247,8 @@ for i in range(len(Fechas)):
 
 
 Trench=pd.read_csv('./trench_cocos.csv', delimiter=',')
+Reference=np.array([[-104.5,16],[-104,16],[-103.5,16],[-103,16]])
+MRef=[4.5,5.5,6.5,7.5]
 
 
 
@@ -271,9 +273,16 @@ for i in range(len(DomX)):
     plt.axhline(DomY[i],color="firebrick",alpha=0.5)
 plt.plot(Trench["x"],Trench["y"],color="hotpink")
 plt.scatter(Datos["Longitude"],Datos["Latitude"],s=np.exp(5*(M-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5)
+plt.scatter(Reference[:,0],Reference[:,1],s=np.exp(5*(MRef-np.min(M))/(np.max(M)-np.min(M))+1),alpha=0.5,color="Green")
+for i in range(len(Reference)):
+    plt.text(Reference[i,0]-0.2,Reference[i,1]+0.2, str(i+4.5))
+
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
 
+
+
+###############################################################################
 DeltaX=DomX[1]-DomX[0]
 DeltaY=DomY[1]-DomY[0]
 
@@ -439,4 +448,41 @@ fig2.write_html("./figures/Genealogy"+".html")
 #     suma+=klam(MObs,A,alpha,M0)*intg*intf
 
 # print(suma,len(PIJ))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
