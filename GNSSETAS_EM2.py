@@ -248,7 +248,7 @@ for i in range(len(Fechas)):
 
 Trench=pd.read_csv('./trench_cocos.csv', delimiter=',')
 Reference=np.array([[-104.5,16],[-104,16],[-103.5,16],[-103,16]])
-MRef=[4.5,5.5,6.5,7.5]
+MRef=np.array([4.5,5.5,6.5,7.5])
 
 
 
