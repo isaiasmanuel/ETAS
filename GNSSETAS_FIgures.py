@@ -395,6 +395,9 @@ PIJ[192,183]
 PIJ[s,j]
 
 
+for s in np.arange(182,193):
+    plt.annotate(xy=Datos[["Longitude","Latitude"]].loc[s], text=str(Datos["index"].loc[s]))
+    
 
 
 ################################
